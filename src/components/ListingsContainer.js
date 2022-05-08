@@ -3,6 +3,7 @@ import ListingCard from "./ListingCard";
 
 function ListingsContainer({ search }) {
   const [listings, setListings] = useState([]);
+  const [sortBy, setSortBy] = useState("id");
 
   useEffect(() => {
     fetch("http://localhost:6001/listings")
@@ -21,7 +22,15 @@ function ListingsContainer({ search }) {
     return listing.description.toLowerCase().includes(search.toLowerCase());
   });
 
-  const listingCards = filteredListings.map(listingObj => {
+  const sortedListings = filteredListings.sort((listingA, listingB) => {
+    if (sortBy === "id") {
+      return listingA.id - listingB.id
+    } else {
+      return listingA.location.localeCompare(listingB.location)
+    }
+  })
+
+  const listingCards = sortedListings.map(listingObj => {
     return <ListingCard 
       key={listingObj.id} 
       listing={listingObj}
@@ -31,6 +40,8 @@ function ListingsContainer({ search }) {
 
   return (
     <main>
+      <button onClick={() => setSortBy("id")}>Sort By Default</button>
+      <button onClick={() => setSortBy("location")}>Sort By Location</button>
       <ul className="cards">
         {listingCards}
       </ul>
